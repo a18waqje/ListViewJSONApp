@@ -4,6 +4,15 @@ import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.Toolbar;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,6 +20,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 
 // Create a new class, Mountain, that can hold your JSON data
@@ -24,12 +35,56 @@ import java.net.URL;
 // Implement a "refresh" functionality using Android's menu system
 
 
-public class MainActivity extends AppCompatActivity {
+    public class MainActivity extends AppCompatActivity {
+       /* private String[] mountainNames = {"Matterhorn","Mont Blanc","Denali"};
+        private String[] mountainLocations = {"Alps","Alps","Alaska"};
+        private int[] mountainHeights ={4478,4808,6190};
+        private ArrayList<String> listData;
+        private ArrayList<org.brohede.marcus.listviewapp.Mountain> waqarsBerg=new ArrayList<>();
+        */
+        @Override
+        protected void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.activity_main);
+           // Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+            //setSupportActionBar(toolbar);
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+            Mountain m = new Mountain ("R2");
+            Mountain m2 = new Mountain("Fuji","Japan",3776);
+            TextView tv = findViewById(R.id.list_item_textview);
+            tv.setText(m2.info());
+
+           /* listData = new ArrayList<>(Arrays.asList(mountainNames));
+            for (int i=0; i<mountainNames.length; i++){
+                waqarsBerg.add(new org.brohede.marcus.listviewapp.Mountain(mountainNames[i],mountainLocations[i],mountainHeights[i]));
+                String[] waq = new String[] {"All","is","well!"};
+                Toast.makeText(getApplicationContext(), Arrays.toString(waq), Toast.LENGTH_SHORT).show();
+                Log.d("EMIL", Arrays.toString(waq));
+                Button b =(Button) findViewById(R.id.toasterButton);
+                b.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        EditText myEdtBox =(EditText) findViewById(R.id.editText);
+                        Toast.makeText(getApplicationContext(), myEdtBox.getText(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+                ArrayAdapter<org.brohede.marcus.listviewapp.Mountain> adapter=new ArrayAdapter<org.brohede.marcus.listviewapp.Mountain>(this,R.layout.list_item_textview,R.id.list_item_textview,waqarsBerg);
+
+                ListView my_listview=(ListView) findViewById(R.id.my_listview);
+
+                my_listview.setAdapter(adapter);
+                my_listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+
+                    public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+
+                        Toast.makeText(getApplicationContext(),waqarsBerg.get(position).info(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            //Log.d("WAQAR",waqarsBerg.get(0).getName());
+            */
     }
 
     private class FetchData extends AsyncTask<Void,Void,String>{
@@ -45,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
 
             try {
                 // Construct the URL for the Internet service
-                URL url = new URL("_ENTER_THE_URL_TO_THE_PHP_SERVICE_SERVING_JSON_HERE_");
+                URL url = new URL("http://wwwlab.iit.his.se/brom/kurser/mobilprog/dbservice/admin/getdataasjson.php?type=brom");
 
                 // Create the request to the PHP-service, and open the connection
                 urlConnection = (HttpURLConnection) url.openConnection();
@@ -96,6 +151,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String o) {
             super.onPostExecute(o);
+            Log.d( "Mountain",o);
             // This code executes after we have received our data. The String object o holds
             // the un-parsed JSON string or is null if we had an IOException during the fetch.
 
