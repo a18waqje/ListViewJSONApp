@@ -4,6 +4,8 @@ import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -13,6 +15,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.Toolbar;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -36,12 +42,14 @@ import java.util.Arrays;
 
 
     public class MainActivity extends AppCompatActivity {
-       /* private String[] mountainNames = {"Matterhorn","Mont Blanc","Denali"};
+      private String[] mountainNames = {"Matterhorn","Mont Blanc","Denali"};
         private String[] mountainLocations = {"Alps","Alps","Alaska"};
         private int[] mountainHeights ={4478,4808,6190};
         private ArrayList<String> listData;
-        private ArrayList<org.brohede.marcus.listviewapp.Mountain> waqarsBerg=new ArrayList<>();
-        */
+        private ArrayList<Mountain> waqarsBerg=new ArrayList<>();
+        private ArrayAdapter<Mountain> adapter;
+        ListView my_listview;
+
         @Override
         protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
@@ -49,13 +57,13 @@ import java.util.Arrays;
            // Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
             //setSupportActionBar(toolbar);
 
-            Mountain m = new Mountain ("R2");
+           /* Mountain m = new Mountain ("R2");
             Mountain m2 = new Mountain("Fuji","Japan",3776);
             TextView tv = findViewById(R.id.list_item_textview);
-            tv.setText(m2.info());
+            tv.setText(m2.info());*/
 
-           /* listData = new ArrayList<>(Arrays.asList(mountainNames));
-            for (int i=0; i<mountainNames.length; i++){
+            //listData = new ArrayList<>(Arrays.asList(mountainNames));
+            /*for (int i=0; i<mountainNames.length; i++){
                 waqarsBerg.add(new org.brohede.marcus.listviewapp.Mountain(mountainNames[i],mountainLocations[i],mountainHeights[i]));
                 String[] waq = new String[] {"All","is","well!"};
                 Toast.makeText(getApplicationContext(), Arrays.toString(waq), Toast.LENGTH_SHORT).show();
@@ -68,11 +76,11 @@ import java.util.Arrays;
                         Toast.makeText(getApplicationContext(), myEdtBox.getText(), Toast.LENGTH_SHORT).show();
                     }
                 });
-                ArrayAdapter<org.brohede.marcus.listviewapp.Mountain> adapter=new ArrayAdapter<org.brohede.marcus.listviewapp.Mountain>(this,R.layout.list_item_textview,R.id.list_item_textview,waqarsBerg);
+                */
+                adapter=new ArrayAdapter<Mountain>(this,R.layout.list_item_textview,R.id.list_item_textview,waqarsBerg);
+                my_listview=(ListView) findViewById(R.id.my_listview);
 
-                ListView my_listview=(ListView) findViewById(R.id.my_listview);
-
-                my_listview.setAdapter(adapter);
+                /*my_listview.setAdapter(adapter);
                 my_listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
 
@@ -80,14 +88,34 @@ import java.util.Arrays;
 
                         Toast.makeText(getApplicationContext(),waqarsBerg.get(position).info(), Toast.LENGTH_SHORT).show();
                     }
-                });
-            }
+                });*/
+
 
             //Log.d("WAQAR",waqarsBerg.get(0).getName());
-            */
+
+           new FetchData().execute();
     }
 
-    private class FetchData extends AsyncTask<Void,Void,String>{
+        @Override
+        public boolean onCreateOptionsMenu(Menu menu) {
+            getMenuInflater().inflate(R.menu.menu_main,menu);
+            return true;
+        }
+
+        @Override
+        public boolean onOptionsItemSelected(MenuItem item) {
+            int id = item.getItemId();
+
+            if(id == R.id.action_refresh){
+                Log.d("Waqar_debug","Refresh pressed!");
+                return true;
+            }else{
+                return false;
+            }
+
+        }
+
+        private class FetchData extends AsyncTask<Void,Void,String>{
         @Override
         protected String doInBackground(Void... params) {
             // These two variables need to be declared outside the try/catch
@@ -157,6 +185,61 @@ import java.util.Arrays;
 
             // Implement a parsing code that loops through the entire JSON and creates objects
             // of our newly created Mountain class.
+
+
+            try {
+ // For loop
+                JSONArray mountains = new JSONArray(o);
+                Log.d( "a18waqje",mountains.get(0).toString());
+                //JSONObject obj =  mountains.getJSONObject(0);
+                //Log.d( "Mountain",obj.getString("ID"));
+                //Log.d( "Mountain",""+mountains.length());
+                //String id = obj.getString("ID");
+
+                //JSONArray aProperty = obj.getJSONArray("properties");
+                for (int i = 0; i<mountains.length(); i++){
+                    Log.d( "a18waqje",""+mountains.length());
+
+                   JSONObject ajProperty = mountains.getJSONObject(i);
+
+                   String name = (String) ajProperty.get("name");
+                   Log.d("a18waqje", name);
+                   String location = ajProperty.getString("location");
+                   int height = ajProperty.getInt("size");
+                   Log.d("a18waqje", name+","+location+","+height);
+                   adapter.add(new Mountain(name,location,height));
+                   Log.d("a18waqje", ajProperty.getString("name"));
+
+                }
+
+                my_listview.setAdapter(adapter);
+                my_listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+
+                    public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+
+                        Toast.makeText(getApplicationContext(),waqarsBerg.get(position).info(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+                /*
+                ArrayAdapter<Mountain> adapter=new ArrayAdapter<Mountain>(getApplicationContext(),R.layout.list_item_textview,R.id.list_item_textview,waqarsBerg);
+
+                ListView my_listview=(ListView) findViewById(R.id.my_listview);
+
+                my_listview.setAdapter(adapter);
+                */
+
+
+                // Skapa Mountain obj för varje varv
+                // Lägg till nya Mountain oibj i ArrayAdapter
+
+
+
+            }
+            catch (Exception e) {
+                Log.e("a18waqje","E:"+e.getMessage());
+            }
+
         }
     }
 }
